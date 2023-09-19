@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="BarModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Customer">
+    <Key>
+      <PropertyRef Name="Customer_id" />
+    </Key>
+    <Property Name="Customer_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="FirstName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="LastName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Email" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="Orders" Relationship="Self.FK_order_order_id" FromRole="Customer" ToRole="Orders" />
+    <NavigationProperty Name="OrderItems" Relationship="Self.FK_orderitems_orderitems_id" FromRole="Customer" ToRole="OrderItems" />
+  </EntityType>
+  <EntityType Name="Drink">
+    <Key>
+      <PropertyRef Name="Drink_id" />
+    </Key>
+    <Property Name="Drink_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="Price" Type="Double" />
+    <Property Name="Category" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="OrderItems" Relationship="Self.FK_orderitems2_orderitems_id" FromRole="Drink" ToRole="OrderItems" />
+  </EntityType>
+  <EntityType Name="OrderItem">
+    <Key>
+      <PropertyRef Name="OrderItem_id" />
+    </Key>
+    <Property Name="OrderItem_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Customer_id" Type="Int32" />
+    <Property Name="Order_id" Type="Int32" />
+    <Property Name="Drink_id" Type="Int32" />
+    <Property Name="Quantity" Type="Int32" />
+    <Property Name="Subtotal" Type="Double" />
+    <NavigationProperty Name="Customer" Relationship="Self.FK_orderitems_orderitems_id" FromRole="OrderItems" ToRole="Customer" />
+    <NavigationProperty Name="Drink" Relationship="Self.FK_orderitems2_orderitems_id" FromRole="OrderItems" ToRole="Drink" />
+    <NavigationProperty Name="Order" Relationship="Self.FK_orderitems1_orderitems_id" FromRole="OrderItems" ToRole="Orders" />
+    <Property Name="UnitPrice" Type="Double" />
+  </EntityType>
+  <EntityType Name="Order">
+    <Key>
+      <PropertyRef Name="Order_id" />
+    </Key>
+    <Property Name="Order_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Customer_id" Type="Int32" Nullable="false" />
+    <Property Name="OrderDate" Type="DateTime" Precision="3" />
+    <Property Name="TableNumber" Type="Int32" />
+    <Property Name="TotalAmount" Type="Double" />
+    <NavigationProperty Name="Customer" Relationship="Self.FK_order_order_id" FromRole="Orders" ToRole="Customer" />
+    <NavigationProperty Name="OrderItems" Relationship="Self.FK_orderitems1_orderitems_id" FromRole="Orders" ToRole="OrderItems" />
+  </EntityType>
+  <Association Name="FK_order_order_id">
+    <End Role="Customer" Type="Self.Customer" Multiplicity="1" />
+    <End Role="Orders" Type="Self.Order" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Customer">
+        <PropertyRef Name="Customer_id" />
+      </Principal>
+      <Dependent Role="Orders">
+        <PropertyRef Name="Customer_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_orderitems_orderitems_id">
+    <End Role="Customer" Type="Self.Customer" Multiplicity="0..1" />
+    <End Role="OrderItems" Type="Self.OrderItem" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Customer">
+        <PropertyRef Name="Customer_id" />
+      </Principal>
+      <Dependent Role="OrderItems">
+        <PropertyRef Name="Customer_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_orderitems2_orderitems_id">
+    <End Role="Drink" Type="Self.Drink" Multiplicity="0..1" />
+    <End Role="OrderItems" Type="Self.OrderItem" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Drink">
+        <PropertyRef Name="Drink_id" />
+      </Principal>
+      <Dependent Role="OrderItems">
+        <PropertyRef Name="Drink_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_orderitems1_orderitems_id">
+    <End Role="Orders" Type="Self.Order" Multiplicity="0..1" />
+    <End Role="OrderItems" Type="Self.OrderItem" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Orders">
+        <PropertyRef Name="Order_id" />
+      </Principal>
+      <Dependent Role="OrderItems">
+        <PropertyRef Name="Order_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="BarEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Customers" EntityType="Self.Customer" />
+    <EntitySet Name="Drinks" EntityType="Self.Drink" />
+    <EntitySet Name="OrderItems" EntityType="Self.OrderItem" />
+    <EntitySet Name="Orders" EntityType="Self.Order" />
+    <AssociationSet Name="FK_order_order_id" Association="Self.FK_order_order_id">
+      <End Role="Customer" EntitySet="Customers" />
+      <End Role="Orders" EntitySet="Orders" />
+    </AssociationSet>
+    <AssociationSet Name="FK_orderitems_orderitems_id" Association="Self.FK_orderitems_orderitems_id">
+      <End Role="Customer" EntitySet="Customers" />
+      <End Role="OrderItems" EntitySet="OrderItems" />
+    </AssociationSet>
+    <AssociationSet Name="FK_orderitems2_orderitems_id" Association="Self.FK_orderitems2_orderitems_id">
+      <End Role="Drink" EntitySet="Drinks" />
+      <End Role="OrderItems" EntitySet="OrderItems" />
+    </AssociationSet>
+    <AssociationSet Name="FK_orderitems1_orderitems_id" Association="Self.FK_orderitems1_orderitems_id">
+      <End Role="Orders" EntitySet="Orders" />
+      <End Role="OrderItems" EntitySet="OrderItems" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>
